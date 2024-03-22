@@ -41,7 +41,7 @@ jobs:
     - name: Send the time to Discord
       uses: satak/webrequest-action@master
       with: 
-         url: https://discord.com/api/webhooks/1160366710998696026/CdcDQYe78mRxAx9SYIIwAkuneSeaIeSS01S7NFWEKCm5IGo2lODxOhGmeF41rHO1q-Cf
+         url: https://discord.com/api/webhooks/${{ secrets.DISCORD_URL }}
          method: POST
          payload: '{ "content": "Sam did a commit at ${{ steps.time.outputs.now }}!"}'
     
