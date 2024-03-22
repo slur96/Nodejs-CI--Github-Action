@@ -13,3 +13,5 @@ Goal of Project:
 *Test Node-App*
 
 *Create a CI pipeline that builds the container image and pushes it to a registry*
+
+*Send a Notification to Discord*
