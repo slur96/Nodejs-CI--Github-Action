@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup QEMU for Docker
+      uses: docker/setup-qemu-action@v2
+      
+    - name: Login to Dockerhub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_TOKEN }}
+        
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/node-app:latest
+    
+    - name: Get the time
+      id: time
+      run: echo "::set-output name=now::$(date +'%r')"
+      env:
+        TZ: America/New_York
+    
+    - name: Send the time to Discord
+      uses: satak/webrequest-action@master
+      with: 
+         url: https://discord.com/api/webhooks/1160366710998696026/CdcDQYe78mRxAx9SYIIwAkuneSeaIeSS01S7NFWEKCm5IGo2lODxOhGmeF41rHO1q-Cf
+         method: POST
+         payload: '{ "content": "Sam did a commit ${{ steps.time.outputs.now }}!"}'
+    
+    - name: Send notification to Slack
+      env:
+         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+         SLACK_USERNAME: ThisIsMyUsername # Optional. (defaults to webhook app)
+         SLACK_CHANNEL: general # Optional. (defaults to webhook)
+         SLACK_AVATAR: repository # Optional. can be (repository, sender, an URL) (defaults to webhook app avatar)
+      uses: Ilshidur/action-slack@2.0.2
+      with:
+        args: 'A new commit has been pushed by Sam.'
